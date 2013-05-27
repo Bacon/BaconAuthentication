@@ -7,18 +7,17 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause Simplified BSD License
  */
 
-namespace BaconAuthentication\Resolver;
+namespace BaconAuthentication\Plugin;
 
-/**
- * Resolver interface.
- */
-interface ResolverInterface
+use Zend\Stdlib\RequestInterface;
+
+interface ResetPluginInterface
 {
     /**
-     * Resolves an identity to a principal.
+     * Resets credentials to anyonymous state.
      *
-     * @param  int|float|string $identity
-     * @return null|mixed
+     * @param  RequestInterface $request
+     * @return void
      */
-    public function resolve($identity);
+    public function resetCredentials(RequestInterface $request);
 }
