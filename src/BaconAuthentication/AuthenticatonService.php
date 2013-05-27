@@ -14,6 +14,7 @@ use BaconAuthentication\Plugin\ChallengePluginInterface;
 use BaconAuthentication\Plugin\EventAwarePluginInterface;
 use BaconAuthentication\Plugin\ExtractionPluginInterface;
 use BaconAuthentication\Plugin\ResetPluginInterface;
+use BaconAuthentication\Result\Result;
 use BaconAuthentication\Result\ResultInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManager;
@@ -141,7 +142,7 @@ class AuthenticationService implements
 
         if ($result === null) {
             if ($this->challenge()) {
-                $result = new ChallengeResult();
+                $result = new Result(Result::STATE_CHALLENGE);
                 $event->setResult($result);
             }
         } else {
