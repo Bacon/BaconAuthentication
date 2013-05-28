@@ -31,7 +31,7 @@ class Session implements
     protected $session;
 
     /**
-     * @param string|null $namespace
+     * @param string|null      $namespace
      * @param ManagerInterface $manager
      */
     public function __construct($namespace = null, ManagerInterface $manager = null)
