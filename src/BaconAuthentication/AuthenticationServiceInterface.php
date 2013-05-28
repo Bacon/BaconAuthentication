@@ -12,6 +12,9 @@ namespace BaconAuthentication;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 
+/**
+ * Generic authentication service interface.
+ */
 interface AuthenticationServiceInterface
 {
     /**

@@ -14,6 +14,9 @@ use Zend\EventManager\Event;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 
+/**
+ * Event fired within the authentication process.
+ */
 class AuthenticationEvent extends Event
 {
     const EVENT_AUTHENTICATE_PRE  = 'authenticate.pre';

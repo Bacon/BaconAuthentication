@@ -9,6 +9,9 @@
 
 namespace BaconAuthentication\Result;
 
+/**
+ * Generic result interface.
+ */
 interface ResultInterface
 {
     /**
@@ -33,19 +36,13 @@ interface ResultInterface
     public function isChallenge();
 
     /**
-     * Returns the identity of the subject.
+     * Returns the payload associated with the result.
      *
-     * If the authentication was successful, the resolved identity of the
-     * subject will be returned, null otherwise.
+     * For a successful result, the payload should be the identity of the
+     * subject. In the case of a failure, it should contain error information.
+     * For a challenge, no payload is required.
      *
-     * @return int|float|string|null
+     * @return mixed|null
      */
-    public function getIdentity();
-
-    /**
-     * Returns the error message if any.
-     *
-     * @return string|null
-     */
-    public function getError();
+    public function getPayload();
 }

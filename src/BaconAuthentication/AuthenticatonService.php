@@ -23,6 +23,9 @@ use Zend\Stdlib\PriorityQueue;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 
+/**
+ * Pluggable authentication service implementation.
+ */
 class AuthenticationService implements
     AuthenticationServiceInterface,
     EventManagerAwareInterface

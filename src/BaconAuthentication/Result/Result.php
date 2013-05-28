@@ -9,11 +9,18 @@
 
 namespace BaconAuthentication\Result;
 
+use BaconAuthentication\Exception;
+
+/**
+ * Generic result implementation.
+ */
 class Result implements ResultInterface
 {
     const STATE_SUCCESS   = 'success';
     const STATE_FAILURE   = 'failure';
     const STATE_CHALLENGE = 'challenge';
+
+    protected static $allowedStates = array('success', 'failure', 'challenge');
 
     /**
      * @var string
@@ -21,25 +28,25 @@ class Result implements ResultInterface
     protected $state;
 
     /**
-     * @var int|float|string|null
+     * @var mixed|null
      */
-    protected $identity;
+    protected $payload;
 
     /**
-     * @var string|null
+     * @param string     $state
+     * @param mixed|null $payload
      */
-    protected $error;
-
-    /**
-     * @param string                $state
-     * @param int|float|string|null $identity
-     * @param string|null           $error
-     */
-    public function __construct($state, $identity = null, $error = null)
+    public function __construct($state, $payload = null)
     {
-        $this->state    = $state;
-        $this->identity = $identity;
-        $this->message  = $message;
+        if (!in_array($state, self::$allowedStates)) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s is not a valid state',
+                $state
+            ));
+        }
+
+        $this->state   = $state;
+        $this->payload = $payload;
     }
 
     /**
@@ -76,21 +83,13 @@ class Result implements ResultInterface
     }
 
     /**
-     * getIdentity(): defined by ResultInterface.
+     * getPayload(): defined by ResultInterface.
      *
-     * @see    ResultInterface::getIdentity()
-     * @return int|float|string|null
+     * @see    ResultInterface::getPayload()
+     * @return mixed
      */
-    public function getIdentity()
+    public function getPayload()
     {
-        return $this->identity;
+        return $this->payload;
     }
-
-    /**
-     * getError(): defined by ResultInterface.
-     *
-     * @see    ResultInterface::getError()
-     * @return string|null
-     */
-    public function getError();
 }
