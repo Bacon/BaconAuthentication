@@ -16,10 +16,24 @@ use BaconAuthentication\Exception;
  */
 class Result implements ResultInterface
 {
-    const STATE_SUCCESS   = 'success';
-    const STATE_FAILURE   = 'failure';
+    /**
+     * @see ResultInterface::isSuccess()
+     */
+    const STATE_SUCCESS = 'success';
+
+    /**
+     * @see ResultInterface::isFailure()
+     */
+    const STATE_FAILURE = 'failure';
+
+    /**
+     * @see ResultInterface::isChallenge()
+     */
     const STATE_CHALLENGE = 'challenge';
 
+    /**
+     * @var array
+     */
     protected static $allowedStates = array('success', 'failure', 'challenge');
 
     /**
