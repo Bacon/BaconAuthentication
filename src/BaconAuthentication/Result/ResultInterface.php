@@ -39,8 +39,9 @@ interface ResultInterface
      * Returns the payload associated with the result.
      *
      * For a successful result, the payload should be the identity of the
-     * subject. In the case of a failure, it should contain error information.
-     * For a challenge, no payload is required.
+     * subject. In the case of a failure, it should contain error information
+     * enclosed in an {@see Error} object. For a challenge, no payload is
+     * required.
      *
      * @return mixed|null
      */

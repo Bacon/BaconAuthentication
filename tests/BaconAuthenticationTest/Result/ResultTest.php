@@ -7,7 +7,7 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause Simplified BSD License
  */
 
-namespace BaconAuthenticationTest;
+namespace BaconAuthenticationTest\Result;
 
 use BaconAuthentication\Result\Result;
 use PHPUnit_Framework_TestCase as TestCase;
