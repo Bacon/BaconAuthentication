@@ -10,6 +10,7 @@
 namespace BaconAuthentication\Plugin;
 
 use Zend\Stdlib\RequestInterface;
+use Zend\Stdlib\ResponseInterface;
 
 interface ExtractionPluginInterface
 {
@@ -17,10 +18,12 @@ interface ExtractionPluginInterface
      * Extracts credentials from a request.
      *
      * If credentials cannot be extracted, the method should return null,
-     * a parameters object otheriwse.
+     * a parameters object otheriwse. To short-circuit the authentication
+     * process and issue a challenge, a Result may be returned as well.
      *
-     * @param  RequestInterface $request
-     * @return null|\Zend\Stdlib\ParametersInterface
+     * @param  RequestInterface  $request
+     * @param  ResponseInterface $response
+     * @return null|\BaconAuthentication\Result\ResultInterface|\Zend\Stdlib\ParametersInterface
      */
-    public function extractCredentials(RequestInterface $request);
+    public function extractCredentials(RequestInterface $request, ResponseInterface $response);
 }

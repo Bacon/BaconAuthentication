@@ -40,9 +40,10 @@ class HttpBasicAuth implements
      *
      * @see    ExtractionPluginInterface::extractCredentials()
      * @param  RequestInterface $request
+     * @param  ResponseInterface $response
      * @return null|Parameters
      */
-    public function extractCredentials(RequestInterface $request)
+    public function extractCredentials(RequestInterface $request, ResponseInterface $response)
     {
         if (!$request instanceof HttpRequest) {
             return null;

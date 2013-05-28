@@ -12,6 +12,8 @@ namespace BaconAuthentication\Plugin;
 use BaconAuthentication\AuthenticationEvent;
 use BaconAuthentication\Result\Result;
 use Zend\EventManager\EventManagerInterface;
+use Zend\Session\ManagerInterface;
+use Zend\Session\Container as SessionContainer;
 use Zend\Stdlib\RequestInterface;
 
 class Session implements
@@ -21,7 +23,7 @@ class Session implements
     /**
      * Default session namespace.
      */
-    const DEFAULT_NAMESPACE = 'baconuser_authentication';
+    const DEFAULT_NAMESPACE = 'baconauthentication';
 
     /**
      * @var SessionContainer
@@ -92,7 +94,7 @@ class Session implements
         $result = $event->getResult();
 
         if ($result->isSuccess()) {
-            $this->session->identity = $result->getIdentity();
+            $this->session->identity = $result->getPayload();
         }
     }
 }
