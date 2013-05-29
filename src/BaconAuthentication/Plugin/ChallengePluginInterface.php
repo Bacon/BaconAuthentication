@@ -12,6 +12,9 @@ namespace BaconAuthentication\Plugin;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 
+/**
+ * Plugin interface for challenge generation.
+ */
 interface ChallengePluginInterface
 {
     /**

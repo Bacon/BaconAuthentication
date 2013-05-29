@@ -15,6 +15,9 @@ use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 use Zend\Stdlib\Parameters;
 
+/**
+ * Identity/Password extraction plugin for HTTP basic auth.
+ */
 class HttpBasicAuth implements
     ChallengePluginInterface,
     ExtractionPluginInterface

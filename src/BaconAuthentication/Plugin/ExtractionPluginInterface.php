@@ -12,6 +12,9 @@ namespace BaconAuthentication\Plugin;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 
+/**
+ * Plugin interface for credential extraction.
+ */
 interface ExtractionPluginInterface
 {
     /**

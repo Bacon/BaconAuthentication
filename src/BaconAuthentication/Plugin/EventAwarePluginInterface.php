@@ -11,6 +11,9 @@ namespace BaconAuthentication\Plugin;
 
 use Zend\EventManager\EventManagerInterface;
 
+/**
+ * Plugin interface for event registration.
+ */
 interface EventAwarePluginInterface
 {
     /**

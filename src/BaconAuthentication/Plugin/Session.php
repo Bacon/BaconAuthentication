@@ -16,6 +16,9 @@ use Zend\Session\ManagerInterface;
 use Zend\Session\Container as SessionContainer;
 use Zend\Stdlib\RequestInterface;
 
+/**
+ * Plugin responsible for tracking the identity between multiple HTTP requests.
+ */
 class Session implements
     EventAwarePluginInterface,
     ResetPluginInterface

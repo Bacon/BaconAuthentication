@@ -11,6 +11,9 @@ namespace BaconAuthentication\Plugin;
 
 use Zend\Stdlib\RequestInterface;
 
+/**
+ * Plugin interface for credential resets.
+ */
 interface ResetPluginInterface
 {
     /**

@@ -11,6 +11,9 @@ namespace BaconAuthentication\Plugin;
 
 use Zend\Stdlib\ParametersInterface;
 
+/**
+ * Plugin interface for credential authentication.
+ */
 interface AuthenticationPluginInterface
 {
     /**
