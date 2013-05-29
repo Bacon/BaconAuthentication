@@ -191,7 +191,7 @@ class AuthenticationService implements
     {
         foreach ($this->extractionPlugins as $extractionPlugin) {
             /* @var $extractionPlugin ExtractionPluginInterface */
-            $credentials = $extractionPlugin->extractCredentials($request);
+            $credentials = $extractionPlugin->extractCredentials($request, $response);
 
             if ($credentials === null) {
                 continue;

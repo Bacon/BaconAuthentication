@@ -12,10 +12,12 @@
         "phpunit/PHPUnit": "3.7.*",
         "satooshi/php-coveralls": "dev-master",
         "zendframework/zend-http": ">=2.1.0",
+        "zendframework/zend-inputfilter": ">=2.1.0",
         "zendframework/zend-session": ">=2.1.0"
     },
     "suggest": {
         "zendframework/zend-http": "For HTTP based plugins",
+        "zendframework/zend-inputfilter": "For HTTP POST filtering",
         "zendframework/zend-session": "For session identity storage"
     },
     "authors": [

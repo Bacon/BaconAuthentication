@@ -9,8 +9,11 @@
 
 namespace BaconAuthentication\Plugin;
 
+use BaconAuthentication\Result\Error;
+use BaconAuthentication\Result\Result;
 use Zend\Http\Request as HttpRequest;
 use Zend\Http\Response as HttpResponse;
+use Zend\InputFilter\InputFilterInterface;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
 use Zend\Stdlib\Parameters;
@@ -38,6 +41,11 @@ class HttpPost implements
     protected $passwordField = 'password';
 
     /**
+     * @var InputFilterInterface
+     */
+    protected $inputFilter;
+
+    /**
      * @param string $loginFormUrl
      */
     public function __construct($loginFormUrl)
@@ -49,22 +57,36 @@ class HttpPost implements
      * Sets the POST name of the identity field.
      *
      * @param  string $identityField
-     * @return void
+     * @return HttpPost
      */
     public function setIdentityField($identityField)
     {
         $this->identityField = (string) $identityField;
+        return $this;
     }
 
     /**
      * Sets the POST name of the password field.
      *
      * @param  string $passwordField
-     * @return void
+     * @return HttpPost
      */
     public function setPasswordField($passwordField)
     {
         $this->passwordField = (string) $passwordField;
+        return $this;
+    }
+
+    /**
+     * Sets an input filter for retreiving credentials.
+     *
+     * @param  InputFilterInterface $inputFilter
+     * @return HttpPost
+     */
+    public function setInputFilter(InputFilterInterface $inputFilter)
+    {
+        $this->inputFilter = $inputFilter;
+        return $this;
     }
 
     /**
@@ -86,6 +108,24 @@ class HttpPost implements
 
         if ($identity === null || $password === null) {
             return null;
+        }
+
+        if ($this->inputFilter !== null) {
+            $this->inputFilter->setData(array(
+                $this->identityField => $identity,
+                $this->passwordField => $password,
+            ));
+
+            if (!$this->inputFilter->isValid()) {
+                return new Result(
+                    Result::STATE_FAILURE,
+                    new Error(__CLASS__, 'InputFilter validation failed')
+                );
+            }
+
+            $values   = $this->inputFilter->getValues();
+            $identity = $values[$this->identityField];
+            $password = $values[$this->passwordField];
         }
 
         return new Parameters(array(

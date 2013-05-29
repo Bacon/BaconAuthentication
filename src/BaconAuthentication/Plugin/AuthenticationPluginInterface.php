@@ -20,7 +20,7 @@ interface AuthenticationPluginInterface
      * Tries to authenticate the user with the given credentials.
      *
      * @param  ParametersInterface $credentials
-     * @return null
+     * @return \BaconAuthentication\Result\ResultInterface|null
      */
     public function authenticateCredentials(ParametersInterface $credentials);
 }
