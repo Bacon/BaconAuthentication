@@ -9,6 +9,7 @@
 
 namespace BaconAuthentication;
 
+use BaconAuthentication\Exception;
 use BaconAuthentication\Plugin\AuthenticationPluginInterface;
 use BaconAuthentication\Plugin\ChallengePluginInterface;
 use BaconAuthentication\Plugin\EventAwarePluginInterface;
@@ -71,7 +72,7 @@ class AuthenticationService implements
      *
      * @param  mixed   $plugin
      * @param  integer $priority
-     * @return void
+     * @return AuthenticationService
      * @throws Exception\InvalidArgumentException
      */
     public function addPlugin($plugin, $priority = 1)
@@ -104,10 +105,13 @@ class AuthenticationService implements
         }
 
         if (!$isValid) {
-            throw new Exception\InvalidArgumentException(
-                'Plugin does not implement any known feature interface'
-            );
+            throw new Exception\InvalidArgumentException(sprintf(
+                '%s does not implement any known plugin interface',
+                is_object($plugin) ? get_class($plugin) : gettype($plugin)
+            ));
         }
+
+        return $this;
     }
 
     /**
@@ -128,11 +132,7 @@ class AuthenticationService implements
               ->setResponse($response);
 
         $shortCircuit = function ($result) {
-            if ($result instanceof ResultInterface) {
-                return true;
-            }
-
-            return false;
+            return ($result instanceof ResultInterface);
         };
 
         $eventResult = $events->trigger(AuthenticationEvent::EVENT_AUTHENTICATE_PRE, $event, $shortCircuit);
@@ -144,7 +144,7 @@ class AuthenticationService implements
         }
 
         if ($result === null) {
-            if ($this->challenge()) {
+            if ($this->challenge($request, $response)) {
                 $result = new Result(Result::STATE_CHALLENGE);
                 $event->setResult($result);
             }
@@ -183,7 +183,7 @@ class AuthenticationService implements
     /**
      * Runs all authentication plugins to get a result.
      *
-     * @param  RequestInterface $request
+     * @param  RequestInterface  $request
      * @param  ResponseInterface $response
      * @return ResultInterface|null
      */
