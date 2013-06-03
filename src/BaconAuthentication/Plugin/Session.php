@@ -56,7 +56,7 @@ class Session implements
     public function attachToEvents(EventManagerInterface $events)
     {
         $events->attach(AuthenticationEvent::EVENT_AUTHENTICATE_PRE, array($this, 'checkSession'));
-        $events->attach(AuthenticationEvent::EVENT_AUTHENTICATE_POST, array($this, 'storeIdentity'));
+        $events->attach(AuthenticationEvent::EVENT_AUTHENTICATE_POST, array($this, 'storeIdentifier'));
     }
 
     /**
@@ -68,36 +68,36 @@ class Session implements
      */
     public function resetCredentials(RequestInterface $request)
     {
-        unset($this->session->identity);
+        unset($this->session->identifier);
     }
 
     /**
-     * Checks the session for an already stored identity.
+     * Checks the session for an already stored identifier.
      *
      * @param  AuthenticationEvent $event
      * @return Result|null
      */
     public function checkSession(AuthenticationEvent $event)
     {
-        if (isset($this->session->identity)) {
-            return new Result(Result::STATE_SUCCESS, $this->session->identity);
+        if (isset($this->session->identifier)) {
+            return new Result(Result::STATE_SUCCESS, $this->session->identifier);
         }
 
         return null;
     }
 
     /**
-     * Stores the identity if the authentication succeeded.
+     * Stores the identifier if the authentication succeeded.
      *
      * @param  AuthenticationEvent $event
      * @return Result
      */
-    public function storeIdentity(AuthenticationEvent $event)
+    public function storeIdentifier(AuthenticationEvent $event)
     {
         $result = $event->getResult();
 
-        if ($result->isSuccess()) {
-            $this->session->identity = $result->getPayload();
+        if ($result->isSuccess() && is_scalar($result->getPayload())) {
+            $this->session->identifier = $result->getPayload();
         }
     }
 }

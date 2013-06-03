@@ -207,6 +207,149 @@ class AuthenticationServiceTest extends TestCase
         );
     }
 
+    public function testAuthenticationFailsWithoutResolution()
+    {
+        $result = $this->getMock('BaconAuthentication\Result\ResultInterface');
+        $result->expects($this->any())
+               ->method('isSuccess')
+               ->will($this->returnValue(true));
+        $result->expects($this->any())
+               ->method('getPayload')
+               ->will($this->returnValue(1));
+
+        $service = new AuthenticationService();
+        $service->getEventManager()->attach(
+            'authenticate.post',
+            function () use ($result) {
+                return $result;
+            }
+        );
+
+        $result = $service->authenticate(
+            $this->getMock('Zend\Stdlib\RequestInterface'),
+            $this->getMock('Zend\Stdlib\ResponseInterface')
+        );
+
+        $this->assertTrue($result->isFailure());
+        $this->assertEquals(
+            'BaconAuthentication\AuthenticationService',
+            $result->getPayload()->getScope()
+        );
+        $this->assertEquals(
+            'Subject could not be resolved',
+            $result->getPayload()->getMessage()
+        );
+    }
+
+    public function testSubjectResolution()
+    {
+        $result = $this->getMock('BaconAuthentication\Result\ResultInterface');
+        $result->expects($this->any())
+               ->method('isSuccess')
+               ->will($this->returnValue(true));
+        $result->expects($this->any())
+               ->method('getPayload')
+               ->will($this->returnValue(1));
+
+        $service = new AuthenticationService();
+        $service->getEventManager()->attach(
+            'authenticate.post',
+            function () use ($result) {
+                return $result;
+            }
+        );
+
+        $plugin = $this->getMock('BaconAuthentication\Plugin\ResolutionPluginInterface');
+        $plugin->expects($this->once())
+               ->method('resolveSubject')
+               ->with($this->equalTo(1))
+               ->will($this->returnValue(array('name' => 'foo')));
+        $service->addPlugin($plugin);
+
+        $result = $service->authenticate(
+            $this->getMock('Zend\Stdlib\RequestInterface'),
+            $this->getMock('Zend\Stdlib\ResponseInterface')
+        );
+
+        $this->assertTrue($result->isSuccess());
+        $this->assertEquals(
+            array('name' => 'foo'),
+            $result->getPayload()
+        );
+    }
+
+    public function testResolutionPreShortCircuit()
+    {
+        $result = $this->getMock('BaconAuthentication\Result\ResultInterface');
+        $result->expects($this->any())
+               ->method('isSuccess')
+               ->will($this->returnValue(true));
+        $result->expects($this->any())
+               ->method('getPayload')
+               ->will($this->returnValue(1));
+
+        $service = new AuthenticationService();
+        $service->getEventManager()->attach(
+            'authenticate.post',
+            function () use ($result) {
+                return $result;
+            }
+        );
+
+        $expectedResult = $this->getMock('BaconAuthentication\Result\ResultInterface');
+
+        $service->getEventManager()->attach(
+            'resolve.pre',
+            function () use ($expectedResult) {
+                return $expectedResult;
+            }
+        );
+
+        $this->assertSame(
+            $expectedResult,
+            $service->authenticate(
+                $this->getMock('Zend\Stdlib\RequestInterface'),
+                $this->getMock('Zend\Stdlib\ResponseInterface')
+            )
+        );
+    }
+
+    public function testResolutionPostShortCircuit()
+    {
+        $result = $this->getMock('BaconAuthentication\Result\ResultInterface');
+        $result->expects($this->any())
+               ->method('isSuccess')
+               ->will($this->returnValue(true));
+        $result->expects($this->any())
+               ->method('getPayload')
+               ->will($this->returnValue(1));
+
+        $service = new AuthenticationService();
+        $service->getEventManager()->attach(
+            'authenticate.post',
+            function () use ($result) {
+                return $result;
+            }
+        );
+
+        $expectedResult = $this->getMock('BaconAuthentication\Result\ResultInterface');
+
+        $service->getEventManager()->attach(
+            'resolve.post',
+            function () use ($expectedResult) {
+                return $expectedResult;
+            }
+        );
+
+        $this->assertSame(
+            $expectedResult,
+            $service->authenticate(
+                $this->getMock('Zend\Stdlib\RequestInterface'),
+                $this->getMock('Zend\Stdlib\ResponseInterface')
+            )
+        );
+    }
+
     public function testResetCredentials()
     {
         $request = $this->getMock('Zend\Stdlib\RequestInterface');
