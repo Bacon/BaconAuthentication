@@ -29,32 +29,32 @@ use Zend\Stdlib\ResponseInterface;
 /**
  * Pluggable authentication service implementation.
  */
-class AuthenticationService implements
+class PluggableAuthenticationService implements
     AuthenticationServiceInterface,
     EventManagerAwareInterface
 {
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|AuthenticationPluginInterface[]
      */
     protected $authenticationPlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ChallengePluginInterface[]
      */
     protected $challengePlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ExtractionPluginInterface[]
      */
     protected $extractionPlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ResetPluginInterface[]
      */
     protected $resetPlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ResolutionPluginInterface[]
      */
     protected $resolutionPlugins;
 
@@ -80,7 +80,7 @@ class AuthenticationService implements
      *
      * @param  mixed   $plugin
      * @param  integer $priority
-     * @return AuthenticationService
+     * @return PluggableAuthenticationService
      * @throws Exception\InvalidArgumentException
      */
     public function addPlugin($plugin, $priority = 1)
@@ -176,7 +176,7 @@ class AuthenticationService implements
             throw new Exception\RuntimeException('No plugin was able to generate a result');
         }
 
-        if ($result->isSuccess() && is_scalar($result->getPayload())) {
+        if ($result->isSuccess()) {
             $eventResult = $events->trigger(AuthenticationEvent::EVENT_RESOLVE_PRE, $event, $shortCircuit);
 
             if ($eventResult->stopped()) {
@@ -272,7 +272,7 @@ class AuthenticationService implements
     /**
      * Tries to resolve a subject.
      *
-     * @param  int|float|string $identifier
+     * @param  mixed $identifier
      * @return mixed|null
      */
     protected function resolveSubject($identifier)
@@ -293,7 +293,7 @@ class AuthenticationService implements
      * Sets the event manager.
      *
      * @param  EventManagerInterface $eventManager
-     * @return AuthenticationService
+     * @return PluggableAuthenticationService
      */
     public function setEventManager(EventManagerInterface $eventManager)
     {
