@@ -64,41 +64,41 @@ class SessionTest extends TestCase
                    $this->equalTo(AuthenticationEvent::EVENT_AUTHENTICATE_POST)
                ), $this->logicalOr(
                    $this->equalTo(array($session, 'checkSession')),
-                   $this->equalTo(array($session, 'storeIdentity'))
+                   $this->equalTo(array($session, 'storeIdentifier'))
                ));
 
         $session->attachToEvents($events);
     }
 
-    public function testIdentityStorageWithSuccessfulResult()
+    public function testIdentifierStorageWithSuccessfulResult()
     {
         $session   = new Session();
         $container = $this->getContainer($session);
 
         $event = new AuthenticationEvent();
         $event->setResult(new Result(Result::STATE_SUCCESS, 'foobar'));
-        $session->storeIdentity($event);
+        $session->storeIdentifier($event);
 
-        $this->assertEquals('foobar', $container->identity);
+        $this->assertEquals('foobar', $container->identifier);
     }
 
-    public function testIdentityStorageWithFailedResult()
+    public function testIdentifierStorageWithFailedResult()
     {
         $session   = new Session();
         $container = $this->getContainer($session);
 
         $event = new AuthenticationEvent();
         $event->setResult(new Result(Result::STATE_FAILURE));
-        $session->storeIdentity($event);
+        $session->storeIdentifier($event);
 
-        $this->assertNull($container->identity);
+        $this->assertNull($container->identifier);
     }
 
-    public function testCheckSessionWithExistingIdentity()
+    public function testCheckSessionWithExistingIdentifier()
     {
         $session   = new Session();
         $container = $this->getContainer($session);
-        $container->identity = 'foobar';
+        $container->identifier = 'foobar';
 
         $event  = new AuthenticationEvent();
         $result = $session->checkSession($event);
@@ -106,13 +106,11 @@ class SessionTest extends TestCase
         $this->assertEquals('foobar', $result->getPayload());
     }
 
-    public function testCheckSessionWithoutIdentity()
+    public function testCheckSessionWithoutIdentifier()
     {
-        $session   = new Session();
-        $container = $this->getContainer($session);
-
-        $event  = new AuthenticationEvent();
-        $result = $session->checkSession($event);
+        $session = new Session();
+        $event   = new AuthenticationEvent();
+        $result  = $session->checkSession($event);
 
         $this->assertNull($result);
     }
@@ -122,10 +120,10 @@ class SessionTest extends TestCase
         $session   = new Session();
         $container = $this->getContainer($session);
 
-        $container->identity = 'foobar';
+        $container->identifier = 'foobar';
         $session->resetCredentials($this->getMock('Zend\Stdlib\RequestInterface'));
 
-        $this->assertNull($container->identity);
+        $this->assertNull($container->identifier);
     }
 
     /**

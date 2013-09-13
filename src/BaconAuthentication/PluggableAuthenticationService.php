@@ -15,6 +15,8 @@ use BaconAuthentication\Plugin\ChallengePluginInterface;
 use BaconAuthentication\Plugin\EventAwarePluginInterface;
 use BaconAuthentication\Plugin\ExtractionPluginInterface;
 use BaconAuthentication\Plugin\ResetPluginInterface;
+use BaconAuthentication\Plugin\ResolutionPluginInterface;
+use BaconAuthentication\Result\Error;
 use BaconAuthentication\Result\Result;
 use BaconAuthentication\Result\ResultInterface;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -27,29 +29,34 @@ use Zend\Stdlib\ResponseInterface;
 /**
  * Pluggable authentication service implementation.
  */
-class AuthenticationService implements
+class PluggableAuthenticationService implements
     AuthenticationServiceInterface,
     EventManagerAwareInterface
 {
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|AuthenticationPluginInterface[]
      */
     protected $authenticationPlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ChallengePluginInterface[]
      */
     protected $challengePlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ExtractionPluginInterface[]
      */
     protected $extractionPlugins;
 
     /**
-     * @var PriorityQueue
+     * @var PriorityQueue|ResetPluginInterface[]
      */
     protected $resetPlugins;
+
+    /**
+     * @var PriorityQueue|ResolutionPluginInterface[]
+     */
+    protected $resolutionPlugins;
 
     /**
      * @var EventManagerInterface
@@ -65,6 +72,7 @@ class AuthenticationService implements
         $this->challengePlugins      = new PriorityQueue();
         $this->extractionPlugins     = new PriorityQueue();
         $this->resetPlugins          = new PriorityQueue();
+        $this->resolutionPlugins     = new PriorityQueue();
     }
 
     /**
@@ -72,7 +80,7 @@ class AuthenticationService implements
      *
      * @param  mixed   $plugin
      * @param  integer $priority
-     * @return AuthenticationService
+     * @return PluggableAuthenticationService
      * @throws Exception\InvalidArgumentException
      */
     public function addPlugin($plugin, $priority = 1)
@@ -96,6 +104,11 @@ class AuthenticationService implements
 
         if ($plugin instanceof ResetPluginInterface) {
             $this->resetPlugins->insert($plugin, $priority);
+            $isValid = true;
+        }
+
+        if ($plugin instanceof ResolutionPluginInterface) {
+            $this->resolutionPlugins->insert($plugin, $priority);
             $isValid = true;
         }
 
@@ -156,10 +169,33 @@ class AuthenticationService implements
 
         if ($eventResult->stopped()) {
             $result = $eventResult->last();
+            $event->setResult($result);
         }
 
         if ($result === null) {
             throw new Exception\RuntimeException('No plugin was able to generate a result');
+        }
+
+        if ($result->isSuccess()) {
+            $eventResult = $events->trigger(AuthenticationEvent::EVENT_RESOLVE_PRE, $event, $shortCircuit);
+
+            if ($eventResult->stopped()) {
+                return $eventResult->last();
+            }
+
+            $subject = $this->resolveSubject($result->getPayload());
+
+            if ($subject !== null) {
+                $result = new Result(Result::STATE_SUCCESS, $subject);
+            } else {
+                $result = new Result(Result::STATE_FAILURE, new Error(__CLASS__, 'Subject could not be resolved'));
+            }
+
+            $eventResult = $events->trigger(AuthenticationEvent::EVENT_RESOLVE_POST, $event, $shortCircuit);
+
+            if ($eventResult->stopped()) {
+                return $eventResult->last();
+            }
         }
 
         return $result;
@@ -234,10 +270,30 @@ class AuthenticationService implements
     }
 
     /**
+     * Tries to resolve a subject.
+     *
+     * @param  mixed $identifier
+     * @return mixed|null
+     */
+    protected function resolveSubject($identifier)
+    {
+        foreach ($this->resolutionPlugins as $resolutionPlugin) {
+            /* @var $resolutionPlugin ResolutionPluginInterface */
+            $subject = $resolutionPlugin->resolveSubject($identifier);
+
+            if ($subject !== null) {
+                return $subject;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Sets the event manager.
      *
      * @param  EventManagerInterface $eventManager
-     * @return AuthenticationService
+     * @return PluggableAuthenticationService
      */
     public function setEventManager(EventManagerInterface $eventManager)
     {

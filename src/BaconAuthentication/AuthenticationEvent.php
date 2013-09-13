@@ -21,6 +21,8 @@ class AuthenticationEvent extends Event
 {
     const EVENT_AUTHENTICATE_PRE  = 'authenticate.pre';
     const EVENT_AUTHENTICATE_POST = 'authenticate.post';
+    const EVENT_RESOLVE_PRE       = 'resolve.pre';
+    const EVENT_RESOLVE_POST      = 'resolve.post';
 
     /**
      * @var RequestInterface
