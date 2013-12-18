@@ -22,6 +22,7 @@ use BaconAuthentication\Result\ResultInterface;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Stdlib\PriorityQueue;
 use Zend\Stdlib\RequestInterface;
 use Zend\Stdlib\ResponseInterface;
@@ -112,8 +113,8 @@ class PluggableAuthenticationService implements
             $isValid = true;
         }
 
-        if ($plugin instanceof EventAwarePluginInterface) {
-            $plugin->attachToEvents($this->getEventManager());
+        if ($plugin instanceof ListenerAggregateInterface) {
+            $plugin->attach($this->getEventManager());
             $isValid = true;
         }
 
@@ -132,17 +133,15 @@ class PluggableAuthenticationService implements
      *
      * @see    AuthenticationServiceInterface::authenticate()
      * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
      * @return ResultInterface
      * @throws Exception\RuntimeException
      */
-    public function authenticate(RequestInterface $request, ResponseInterface $response)
+    public function authenticate(RequestInterface $request)
     {
         $events = $this->getEventManager();
         $event = new AuthenticationEvent();
         $event->setTarget($this)
-              ->setRequest($request)
-              ->setResponse($response);
+              ->setRequest($request);
 
         $shortCircuit = function ($result) {
             return ($result instanceof ResultInterface);
@@ -153,11 +152,11 @@ class PluggableAuthenticationService implements
         if ($eventResult->stopped()) {
             $result = $eventResult->last();
         } else {
-            $result = $this->runAuthenticationPlugins($request, $response);
+            $result = $this->runAuthenticationPlugins($request);
         }
 
         if ($result === null) {
-            if ($this->challenge($request, $response)) {
+            if ($this->challenge($request)) {
                 $result = new Result(Result::STATE_CHALLENGE);
                 $event->setResult($result);
             }
@@ -220,14 +219,13 @@ class PluggableAuthenticationService implements
      * Runs all authentication plugins to get a result.
      *
      * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
      * @return ResultInterface|null
      */
-    protected function runAuthenticationPlugins(RequestInterface $request, ResponseInterface $response)
+    protected function runAuthenticationPlugins(RequestInterface $request)
     {
         foreach ($this->extractionPlugins as $extractionPlugin) {
             /* @var $extractionPlugin ExtractionPluginInterface */
-            $credentials = $extractionPlugin->extractCredentials($request, $response);
+            $credentials = $extractionPlugin->extractCredentials($request);
 
             if ($credentials === null) {
                 continue;
@@ -257,11 +255,11 @@ class PluggableAuthenticationService implements
      * @param  ResponseInterface $response
      * @return bool
      */
-    protected function challenge(RequestInterface $request, ResponseInterface $response)
+    protected function challenge(RequestInterface $request)
     {
         foreach ($this->challengePlugins as $challengePlugin) {
             /* @var $challengePlugin ChallengePluginInterface */
-            if ($challengePlugin->challenge($request, $response)) {
+            if ($challengePlugin->challenge($request)) {
                 return true;
             }
         }

@@ -12,7 +12,6 @@ namespace BaconAuthentication\Plugin;
 use Zend\Http\PhpEnvironment\Request as HttpRequest;
 use Zend\Http\Response as HttpResponse;
 use Zend\Stdlib\RequestInterface;
-use Zend\Stdlib\ResponseInterface;
 use Zend\Stdlib\Parameters;
 
 /**
@@ -43,10 +42,9 @@ class HttpBasicAuth implements
      *
      * @see    ExtractionPluginInterface::extractCredentials()
      * @param  RequestInterface $request
-     * @param  ResponseInterface $response
      * @return null|Parameters
      */
-    public function extractCredentials(RequestInterface $request, ResponseInterface $response)
+    public function extractCredentials(RequestInterface $request)
     {
         if (!$request instanceof HttpRequest) {
             return null;
@@ -70,21 +68,18 @@ class HttpBasicAuth implements
      *
      * @see    ChallengePluginInterface::challenge()
      * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
      * @return bool
      */
-    public function challenge(RequestInterface $request, ResponseInterface $response)
+    public function challenge(RequestInterface $request)
     {
-        if (!$response instanceof HttpResponse) {
+        if (!$request instanceof HttpRequest) {
             return false;
         }
 
-        $response->getHeaders()->addHeaderLine(
-            'WWW-Authenticate',
-            'Basic realm="' . addslashes($this->realm) . '"'
-        );
+        $response = new HttpResponse();
         $response->setStatusCode(401);
+        $response->getHeaders()->addHeaderLine('WWW-Authenticate', 'Basic realm="' . addslashes($this->realm) . '"');
 
-        return true;
+        return $response;
     }
 }

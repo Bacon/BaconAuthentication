@@ -12,6 +12,7 @@ namespace BaconAuthentication\Plugin;
 use BaconAuthentication\AuthenticationEvent;
 use BaconAuthentication\Result\Result;
 use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Session\ManagerInterface;
 use Zend\Session\Container as SessionContainer;
 use Zend\Stdlib\RequestInterface;
@@ -19,9 +20,7 @@ use Zend\Stdlib\RequestInterface;
 /**
  * Plugin responsible for tracking the identity between multiple HTTP requests.
  */
-class Session implements
-    EventAwarePluginInterface,
-    ResetPluginInterface
+class Session implements ListenerAggregateInterface, ResetPluginInterface
 {
     /**
      * Default session namespace.
@@ -32,6 +31,11 @@ class Session implements
      * @var SessionContainer
      */
     protected $session;
+
+    /**
+     * @var array
+     */
+    protected $listeners = [];
 
     /**
      * @param string|null      $namespace
@@ -53,10 +57,25 @@ class Session implements
      * @param  EventManagerInterface $events
      * @return void
      */
-    public function attachToEvents(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events)
     {
-        $events->attach(AuthenticationEvent::EVENT_AUTHENTICATE_PRE, array($this, 'checkSession'));
-        $events->attach(AuthenticationEvent::EVENT_AUTHENTICATE_POST, array($this, 'storeIdentifier'));
+        $this->listeners[] = $events->attach(
+            AuthenticationEvent::EVENT_AUTHENTICATE_PRE,
+            array($this, 'checkSession')
+        );
+
+        $this->listeners[] = $events->attach(
+            AuthenticationEvent::EVENT_AUTHENTICATE_POST,
+            array($this, 'storeIdentifier')
+        );
+    }
+
+    public function detach(EventManagerInterface $events)
+    {
+        foreach ($this->listeners as $idx => $callback) {
+            $events->detach($callback);
+            unset($this->listeners[$idx]);
+        }
     }
 
     /**

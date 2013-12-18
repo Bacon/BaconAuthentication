@@ -53,10 +53,7 @@ class HttpPostTest extends TestCase
                 }));
 
         $plugin      = new HttpPost(null);
-        $credentials = $plugin->extractCredentials(
-            $request,
-            $this->getMock('Zend\Stdlib\ResponseInterface')
-        );
+        $credentials = $plugin->extractCredentials($request);
 
         $this->assertInstanceOf('Zend\Stdlib\ParametersInterface', $credentials);
         $this->assertEquals('foo', $credentials->get('identity'));
@@ -80,10 +77,7 @@ class HttpPostTest extends TestCase
         $this->assertSame($plugin, $plugin->setIdentityField('username'));
         $this->assertSame($plugin, $plugin->setPasswordField('secret'));
 
-        $credentials = $plugin->extractCredentials(
-            $request,
-            $this->getMock('Zend\Stdlib\ResponseInterface')
-        );
+        $credentials = $plugin->extractCredentials($request);
 
         $this->assertInstanceOf('Zend\Stdlib\ParametersInterface', $credentials);
         $this->assertEquals('foo', $credentials->get('identity'));
@@ -117,10 +111,7 @@ class HttpPostTest extends TestCase
         $plugin = new HttpPost(null);
         $this->assertSame($plugin, $plugin->setInputFilter($inputFilter));
 
-        $credentials = $plugin->extractCredentials(
-            $request,
-            $this->getMock('Zend\Stdlib\ResponseInterface')
-        );
+        $credentials = $plugin->extractCredentials($request);
 
         $this->assertInstanceOf('Zend\Stdlib\ParametersInterface', $credentials);
         $this->assertEquals('baz', $credentials->get('identity'));
@@ -148,10 +139,7 @@ class HttpPostTest extends TestCase
         $plugin = new HttpPost(null);
         $this->assertSame($plugin, $plugin->setInputFilter($inputFilter));
 
-        $credentials = $plugin->extractCredentials(
-            $request,
-            $this->getMock('Zend\Stdlib\ResponseInterface')
-        );
+        $credentials = $plugin->extractCredentials($request);
 
         $this->assertInstanceOf('BaconAuthentication\Result\ResultInterface', $credentials);
         $this->assertTrue($credentials->isFailure());
@@ -173,28 +161,12 @@ class HttpPostTest extends TestCase
 
     public function testChallengeWithCompatibleResponse()
     {
-        $headers = $this->getMock('Zend\Http\Headers');
-        $headers->expects($this->once())
-                ->method('addHeaderLine')
-                ->with(
-                    $this->equalTo('Location'),
-                    $this->equalTo('/login')
-                );
-
-        $response = $this->getMock('Zend\Http\Response');
-        $response->expects($this->once())
-                 ->method('getHeaders')
-                 ->will($this->returnValue($headers));
-        $response->expects($this->once())
-                 ->method('setStatusCode')
-                 ->with($this->equalTo(302));
-
         $plugin    = new HttpPost('/login');
-        $challenge = $plugin->challenge(
-            $this->getMock('Zend\Stdlib\RequestInterface'),
-            $response
-        );
+        /** @var \Zend\Http\Response $challenge */
+        $challenge = $plugin->challenge($this->getMock('Zend\Http\PhpEnvironment\Request'));
 
-        $this->assertTrue($challenge);
+        $this->assertInstanceOf('Zend\Http\Response', $challenge);
+        $this->assertEquals(302, $challenge->getStatusCode());
+        $this->assertEquals('/login', $challenge->getHeaders()->get('location')->getFieldValue());
     }
 }

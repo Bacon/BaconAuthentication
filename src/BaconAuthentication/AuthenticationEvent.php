@@ -29,10 +29,6 @@ class AuthenticationEvent extends Event
      */
     protected $request;
 
-    /**
-     * @var ResponseInterface
-     */
-    protected $response;
 
     /**
      * @var ResultInterface|null
@@ -54,24 +50,6 @@ class AuthenticationEvent extends Event
     public function setRequest(RequestInterface $request)
     {
         $this->request = $request;
-        return $this;
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param  ResponseInterface $response
-     * @return AuthenticationEvent
-     */
-    public function setResponse(ResponseInterface $response)
-    {
-        $this->response = $response;
         return $this;
     }
 

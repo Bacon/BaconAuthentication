@@ -67,7 +67,7 @@ class SessionTest extends TestCase
                    $this->equalTo(array($session, 'storeIdentifier'))
                ));
 
-        $session->attachToEvents($events);
+        $session->attach($events);
     }
 
     public function testIdentifierStorageWithSuccessfulResult()

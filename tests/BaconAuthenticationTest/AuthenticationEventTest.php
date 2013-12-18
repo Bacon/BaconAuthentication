@@ -25,10 +25,6 @@ class AuthenticationEventTest extends TestCase
                 'Zend\Stdlib\RequestInterface',
             ),
             array(
-                'Response',
-                'Zend\Stdlib\ResponseInterface',
-            ),
-            array(
                 'Result',
                 'BaconAuthentication\Result\ResultInterface',
             ),

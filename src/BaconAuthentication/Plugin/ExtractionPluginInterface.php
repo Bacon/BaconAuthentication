@@ -25,8 +25,8 @@ interface ExtractionPluginInterface
      * process and issue a challenge, a Result may be returned as well.
      *
      * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
+     *
      * @return null|\BaconAuthentication\Result\ResultInterface|\Zend\Stdlib\ParametersInterface
      */
-    public function extractCredentials(RequestInterface $request, ResponseInterface $response);
+    public function extractCredentials(RequestInterface $request);
 }

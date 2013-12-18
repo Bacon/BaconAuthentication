@@ -32,9 +32,9 @@ class PluggableAuthenticationServiceTest extends TestCase
     {
         $service = new PluggableAuthenticationService();
 
-        $plugin = $this->getMock('BaconAuthentication\Plugin\EventAwarePluginInterface');
+        $plugin = $this->getMock('Zend\EventManager\ListenerAggregateInterface');
         $plugin->expects($this->once())
-               ->method('attachToEvents')
+               ->method('attach')
                ->with($this->equalTo($service->getEventManager()));
 
         $service->addPlugin($plugin);
