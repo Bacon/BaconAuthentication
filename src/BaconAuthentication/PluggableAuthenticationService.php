@@ -156,8 +156,11 @@ class PluggableAuthenticationService implements
         }
 
         if ($result === null) {
-            if ($this->challenge($request)) {
-                $result = new Result(Result::STATE_CHALLENGE);
+
+            $result = $this->challenge($request);
+
+            if ($result) {
+                $result = new Result(Result::STATE_CHALLENGE, $result);
                 $event->setResult($result);
             }
         } else {
@@ -171,7 +174,7 @@ class PluggableAuthenticationService implements
             $event->setResult($result);
         }
 
-        if ($result === null) {
+        if ($result === null || $result === false) {
             throw new Exception\RuntimeException('No plugin was able to generate a result');
         }
 

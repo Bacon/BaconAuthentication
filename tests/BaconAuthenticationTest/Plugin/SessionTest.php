@@ -52,7 +52,7 @@ class SessionTest extends TestCase
         $this->assertEquals('foobar', $this->getContainer($session)->getName());
     }
 
-    public function testAttachToEvents()
+    public function testAttach()
     {
         $session = new Session();
 
