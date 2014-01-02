@@ -79,7 +79,6 @@ class SessionTest extends TestCase
         $eventManager = $this->getMock('Zend\\EventManager\\EventManagerInterface');
         $callback     = $this->getMockBuilder('Zend\\Stdlib\\CallbackHandler')->disableOriginalConstructor()->getMock();
 
-
         $eventManager
             ->expects($this->exactly(2))
             ->method('attach')
