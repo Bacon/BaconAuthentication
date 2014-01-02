@@ -156,7 +156,7 @@ class HttpPostTest extends TestCase
             $this->getMock('Zend\Stdlib\ResponseInterface')
         );
 
-        $this->assertFalse($challenge);
+        $this->assertNull($challenge);
     }
 
     public function testChallengeWithCompatibleResponse()

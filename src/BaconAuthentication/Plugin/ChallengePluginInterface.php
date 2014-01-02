@@ -25,7 +25,7 @@ interface ChallengePluginInterface
      *
      * @param  RequestInterface $request
      *
-     * @return false|\Zend\Stdlib\ResponseInterface
+     * @return null|\Zend\Stdlib\ResponseInterface
      */
     public function challenge(RequestInterface $request);
 }

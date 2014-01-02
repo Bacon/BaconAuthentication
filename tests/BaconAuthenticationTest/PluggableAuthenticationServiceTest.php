@@ -49,8 +49,7 @@ class PluggableAuthenticationServiceTest extends TestCase
 
         $service = new PluggableAuthenticationService();
         $service->authenticate(
-            $this->getMock('Zend\Stdlib\RequestInterface'),
-            $this->getMock('Zend\Stdlib\ResponseInterface')
+            $this->getMock('Zend\Stdlib\RequestInterface')
         );
     }
 

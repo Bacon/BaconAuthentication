@@ -57,17 +57,17 @@ class HttpBasicAuthTest extends TestCase
         $this->assertEquals('bar', $credentials->get('password'));
     }
 
-    public function testChallengeWithIncompatibleResponse()
+    public function testChallengeWithIncompatibleRequest()
     {
         $plugin    = new HttpBasicAuth();
         $challenge = $plugin->challenge(
             $this->getMock('Zend\Stdlib\RequestInterface')
         );
 
-        $this->assertFalse($challenge);
+        $this->assertNull($challenge);
     }
 
-    public function testChallengeWithCompatibleResponse()
+    public function testChallengeWithCompatibleRequest()
     {
         $plugin  = new HttpBasicAuth();
         $request = $this->getMock('Zend\Http\PhpEnvironment\Request');
@@ -76,10 +76,10 @@ class HttpBasicAuthTest extends TestCase
         $challenge = $plugin->challenge($request);
 
         $this->assertInstanceOf('Zend\Http\Response', $challenge);
-        $this->assertSame(401, $challenge->getStatusCode());
+        $this->assertEquals(401, $challenge->getStatusCode());
 
         $header = $challenge->getHeaders()->get('WWW-Authenticate');
-        $this->assertSame($header[0]->getFieldValue(), 'Basic realm="BaconAuthentication"');
+        $this->assertEquals($header[0]->getFieldValue(), 'Basic realm="BaconAuthentication"');
     }
 
     public function testChallengeWithCustomRealm()
@@ -93,9 +93,9 @@ class HttpBasicAuthTest extends TestCase
         $challenge = $plugin->challenge($request);
 
         $this->assertInstanceOf('Zend\Http\Response', $challenge);
-        $this->assertSame(401, $challenge->getStatusCode());
+        $this->assertEquals(401, $challenge->getStatusCode());
 
         $header = $challenge->getHeaders()->get('WWW-Authenticate');
-        $this->assertSame($header[0]->getFieldValue(), 'Basic realm="foo\"baz"');
+        $this->assertEquals($header[0]->getFieldValue(), 'Basic realm="foo\"baz"');
     }
 }

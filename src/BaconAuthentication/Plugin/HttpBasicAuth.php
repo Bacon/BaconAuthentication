@@ -68,12 +68,12 @@ class HttpBasicAuth implements
      *
      * @see    ChallengePluginInterface::challenge()
      * @param  RequestInterface  $request
-     * @return bool
+     * @return null|HttpResponse
      */
     public function challenge(RequestInterface $request)
     {
         if (!$request instanceof HttpRequest) {
-            return false;
+            return null;
         }
 
         $response = new HttpResponse();

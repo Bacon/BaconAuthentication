@@ -255,7 +255,6 @@ class PluggableAuthenticationService implements
      * Tries to initiate a challenge.
      *
      * @param  RequestInterface $request
-     * @param  ResponseInterface $response
      * @return bool
      */
     protected function challenge(RequestInterface $request)
