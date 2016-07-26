@@ -21,7 +21,7 @@ interface ExtractionPluginInterface
      * Extracts credentials from a request.
      *
      * If credentials cannot be extracted, the method should return null,
-     * a parameters object otheriwse. To short-circuit the authentication
+     * a parameters object otherwise. To short-circuit the authentication
      * process and issue a challenge, a Result may be returned as well.
      *
      * @param  RequestInterface  $request
