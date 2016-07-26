@@ -23,9 +23,9 @@ interface ChallengePluginInterface
      * If the response can be modified to trigger a challenge, true should be
      * returned, false otherwise.
      *
-     * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
-     * @return bool
+     * @param  RequestInterface $request
+     *
+     * @return null|\Zend\Stdlib\ResponseInterface
      */
-    public function challenge(RequestInterface $request, ResponseInterface $response);
+    public function challenge(RequestInterface $request);
 }

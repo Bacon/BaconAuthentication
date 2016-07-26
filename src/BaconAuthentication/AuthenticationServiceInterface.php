@@ -21,10 +21,9 @@ interface AuthenticationServiceInterface
      * Authenticates a request.
      *
      * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
-     * @return ResultInterface
+     * @return Result\ResultInterface
      */
-    public function authenticate(RequestInterface $request, ResponseInterface $response);
+    public function authenticate(RequestInterface $request);
 
     /**
      * Resets all credentials to anonymous state.

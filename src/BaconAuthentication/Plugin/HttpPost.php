@@ -94,10 +94,9 @@ class HttpPost implements
      *
      * @see    ExtractionPluginInterface::extractCredentials()
      * @param  RequestInterface $request
-     * @param  ResponseInterface $response
      * @return null|Parameters
      */
-    public function extractCredentials(RequestInterface $request, ResponseInterface $response)
+    public function extractCredentials(RequestInterface $request)
     {
         if (!$request instanceof HttpRequest) {
             return null;
@@ -139,21 +138,18 @@ class HttpPost implements
      *
      * @see    ChallengePluginInterface::challenge()
      * @param  RequestInterface  $request
-     * @param  ResponseInterface $response
-     * @return bool
+     * @return null|HttpResponse
      */
-    public function challenge(RequestInterface $request, ResponseInterface $response)
+    public function challenge(RequestInterface $request)
     {
-        if (!$response instanceof HttpResponse) {
-            return false;
+        if (!$request instanceof HttpRequest) {
+            return null;
         }
 
-        $response->getHeaders()->addHeaderLine(
-            'Location',
-            $this->loginFormUrl
-        );
+        $response = new HttpResponse();
         $response->setStatusCode(302);
+        $response->getHeaders()->addHeaderLine('Location', $this->loginFormUrl);
 
-        return true;
+        return $response;
     }
 }

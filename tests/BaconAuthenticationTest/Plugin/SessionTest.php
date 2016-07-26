@@ -52,7 +52,7 @@ class SessionTest extends TestCase
         $this->assertEquals('foobar', $this->getContainer($session)->getName());
     }
 
-    public function testAttachToEvents()
+    public function testAttach()
     {
         $session = new Session();
 
@@ -67,7 +67,33 @@ class SessionTest extends TestCase
                    $this->equalTo(array($session, 'storeIdentifier'))
                ));
 
-        $session->attachToEvents($events);
+        $session->attach($events);
+    }
+
+    /**
+     * @covers \BaconAuthentication\Plugin\Session::detach
+     */
+    public function testDetach()
+    {
+        $listener     = new Session();
+        $eventManager = $this->getMock('Zend\\EventManager\\EventManagerInterface');
+        $callback     = $this->getMockBuilder('Zend\\Stdlib\\CallbackHandler')->disableOriginalConstructor()->getMock();
+
+        $eventManager
+            ->expects($this->exactly(2))
+            ->method('attach')
+            ->will($this->returnValue($callback));
+
+        $listener->attach($eventManager);
+
+        $eventManager
+            ->expects($this->exactly(2))
+            ->method('detach')
+            ->with($callback);
+
+        // Run it twice to make sure the array listener array is empty the second time
+        $listener->detach($eventManager);
+        $listener->detach($eventManager);
     }
 
     public function testIdentifierStorageWithSuccessfulResult()
